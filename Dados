@@ -1,0 +1,109 @@
+#lang racket
+;;aqui fica as informações que mudam
+;; Arquivo para definição dos tipos de dados do programa.
+
+(require 2htdp/image)
+;inclua outros pacotes ou arquivos necessários usando (require ...)
+(require "constantes.rkt")
+
+(provide (all-defined-out)) ;permite que outros arquivos importem deste
+
+;; =================
+;; Definições de dados:
+
+;; EstadoMundo é JOGO-SPACE INICIAL ()
+
+;Definições de dados:
+(define-struct alien (x y dx pontos) #:transparent) ;estrutura
+;;Aliens é (make-aliens Numero[0,inf.] Numero)
+;;interp. a estrutura representa alguns aliens com posicao x e y no cenario
+;;e velocidade(deslocamento) dx no eixo x
+;;Exemplos:
+
+(define AL-INICIAL (make-alien 10 10 5 8))   ;;make cria uma nova estrutura de dados, fica atualizando 
+#;
+;;Alien (al)
+(define (fn-para-alien-al)
+  (...(alien-x y al)
+      (alien-dx al)
+      ))
+
+
+(define AL1 (make-alien 50 10 5 20))
+(define AL2 (make-alien 90 10 5 10))
+
+
+
+;;Pontuação é inteiro
+;;interp. a pontuação do jogo
+;;EXEMPLOS:
+;Pontuacao(p)
+(define P-INICIAL 0)
+(define P  20)
+#;
+(define (fn-para-pontuação p)
+  (....p))
+
+
+;;CANHAO (c)  
+(define-struct canhao( x dx))
+(define CANHAO-INICIAL(make-canhao (/ COMP 2)10))
+(define CANHAO-INO(make-canhao 2 10))
+(define CANHAO-VORTANO(make-canhao -2 10))
+#;
+(define(fn-para-canhao d)
+  (...(canhao-x c) (canhao-dx c)))
+
+
+;;Tiros(t)
+(define-struct tiro (x y existe?) )
+
+(define T-INICIAL(make-tiro -1 -1 #f ))
+(define T-SUBINDO(make-tiro 100  50 #t))
+(define T-SUBINDO-FINAL(make-tiro 20 40  #t))
+(define TIRO_SPEED 5)
+
+#;
+(define (fn-para-tiro t)
+  (...(tiro-y t)
+      (tiro-dy t)
+      ))
+
+
+
+;;ListaDeALiens é um desses:
+;; - empty
+;; -(cons Alien ListaDeAlien)
+;;Exemplos:
+(define LDA0 empty)
+(define LDA1(cons AL-INICIAL empty))
+(define LDA2(list AL-INICIAL AL1 AL2 ))
+             
+#;
+(define(fn-para-lda )
+  (cond [(empty? lda) (...)]
+        [else (...(first lda)
+                  (fn-para-lda (rest lda)))])) ;;função recursiva(fn-para-lda)
+  
+                  
+  
+;;Fim-de-jogo                
+(define-struct jogo(canhao tiro aliens game-over? pontuação))
+;;jogo é(make-jogo  alien canhao Boolean Pontuaçao)
+;;interp. um jogo composto pelos aliens(inimigos), o canhao(personagem),
+;;uma flag que indica se jogo acabou(game over), e a pontuacao
+;;Exemplos
+
+(define JOGO-INICIAL(make-jogo CANHAO-INICIAL T-INICIAL LDA2 #f 0))
+;(define JOGO-MEIO (make-jogo ALIEN-VORTANO-FINAL LDA2 #f 200))
+;(define JOGO-GAME-OVER (make-jogo ALIEN-VORTANO-FINAL T-INICIAL #t 200))
+#;
+
+(define (fn-para jogo j)
+  (... (jogo-alien j)
+       (jogo-canhao j)
+       (jogo-game-over? j)
+       (jogo-pontuacao j)))
+
+
+  

@@ -1,0 +1,230 @@
+; Este arquivo dever conter as definições das funções do jogo (com exceção da main).
+; As definições devem incluir assinatura, propósito, protótipo e templates utilizados.
+
+
+(require 2htdp/image)
+(require 2htdp/universe)
+(require rackunit)
+(require "constantes.rkt") ;importa as constantes definidas no arquivo "constantes.rkt"
+(require "dados.rkt") ;importa as definições de dados definidas no arquivo "dados.rkt"
+
+(provide (all-defined-out)) ;permite que outros arquivos importem deste
+
+;;Funções:
+;; Jogo -> Jogo
+;; inicie o mundo com (main)
+;; !!!
+;(define (tock estado) estado)    ;;protótipo
+
+(define (main)
+  (big-bang JOGO-INICIAL           ;jogo (estado inicial do mundo)
+            (on-tick proximo-jogo)   ; jogo -> jogo
+            ;(retorna um novo estado do mundo dado o atual a cada tick do clock)
+            
+            (to-draw desenha-mundo) ; jogo -> image
+            ;(retorna uma imagem que representa o estado atual do mundo)
+            
+            (on-key trata-tecla) ; Jogo KeyEvent -> Jogo
+            ;(retorna um novo estado do mundo dado o estado atual e uma interação com o teclado)
+            ))
+
+
+
+;;<TipoEntrada> -> <TipoSaida>
+;;canhão -> canhão 
+;;Mover canhao dx passos no eixo x
+;;(define (proximo-canhao c ) (make-canhao 0 0)) ;prototipo /versao que falha
+
+(define (proximo-canhao c)
+  (local [
+          (define proximo-x
+            (+ (canhao-x c) (canhao-dx c)))
+          (define colisao-parede-direita?
+            (>= proximo-x LIMITE-DIR))
+          (define colisao-parede-esquerda?
+            (<= proximo-x LIMITE-ESQ)) ]
+    
+    (cond [colisao-parede-direita?
+           (make-canhao LIMITE-DIR (- (canhao-dx c))) ]
+          [colisao-parede-esquerda?
+           (make-canhao LIMITE-ESQ (- (canhao-dx c))) ]
+          [else
+           (make-canhao proximo-x (canhao-dx c))])))
+
+;;EXEMPLOS/TESTES
+;(check-equal? <chamada da funcao> <retorno esperado>)
+(check-equal? (proximo-canhao (make-canhao 0 15))
+              (make-canhao 15 15)) ;INICIO(Metade da tela)
+(check-equal? (proximo-canhao (make-canhao 15 15))
+              (make-canhao 30 15)) ;INDO(esquerda ou direita)
+(check-equal? (proximo-canhao (make-canhao (- COMP 5) 15))
+              (make-canhao COMP -15)) ;PASSANDO DO LIMITE INDO
+(check-equal? (proximo-canhao (make-canhao 500 -15))
+              (make-canhao 490 -15 )) ;VOLTANDO
+(check-equal? (proximo-canhao (make-canhao 5 -15))
+              (make-canhao 0 15)) ;PASSANDO DO LIMITE VOLTANDO
+(check-equal? (proximo-canhao (make-canhao (- COMP 15) 15))
+              (make-canhao COMP -15)) ;LIMITE INDO
+(check-equal? (proximo-canhao (make-canhao 15 -15))
+              (make-canhao 0 15))  ;LIMITE VOLTANDO
+
+
+
+
+;;<TipoEntrada> -> <TipoSaida>
+;;alien -> alien 
+;;Mover alien dx passos no eixo x
+;;(define (proximo-alien al ) (make-alien 0 0)) ;prototipo /versao que falha
+
+(define (proximo-alien al)
+  (local [
+          (define proximo-x
+            (+ (alien-x al) (alien-dx al)))
+          (define colisao-parede-direita?
+            (>= proximo-x LIMITE-DIR))
+          (define colisao-parede-esquerda?
+            (<= proximo-x LIMITE-ESQ))]   
+    (cond [colisao-parede-direita?
+           (make-alien dx  LIMITE-DIR (+ (alien-y al))) ]
+          [colisao-parede-esquerda?
+           (make-alien dx LIMITE-ESQ (+ (alien-y al))) ]
+          [else
+           (make-alien proximo-x (alien-dx al))])))
+
+;;Exemplos
+;(check-equal? <chamada da funcao> <retorno esperado>)
+(check-equal? (proximo-alien (make-alien 0 15)) 
+              (make-alien 10 15))  ;INICIO
+(check-equal? (proximo-alien (make-alien 10 15)) 
+              (make-alien 20 15)) ;INDO
+(check-equal? (proximo-alien (make-alien (- COMP 5) 15)) 
+              (make-alien COMP -10))  ;PASSANDO DO LIMITE INDO
+(check-equal? (proximo-alien (make-alien 620 -10)) 
+              (make-alien 600 -10)) ;VOLTANDO
+(check-equal? (proximo-alien (make-alien 5 -10)) 
+              (make-alien 0 10)) ;PASSANDO DO LIMITE VOLTANDO
+(check-equal? (proximo-alien (make-alien (- COMP 10) 10))
+              (make-alien COMP -10)) ;LIMITE INDO
+(check-equal? (proximo-alien (make-alien 10 -10)) 
+              (make-alien 0 10)) ;LIMITE VOLTANDO
+
+
+;;<TipoEntrada> -> <TipoSaida>
+;;tiro -> tiro
+;;Mover tiro dy passos no eixo y
+
+
+(define (proximo-tiro t)
+  (local [
+          (define proximo-y
+            (+ (tiro-y t) (tiro-dy t)))
+          (define colisao-tiro?
+            (>= proximo-y LIMITE-TIRO))
+          (define colisao-parede-acima?
+            (<= proximo-y LIMITE-ACI))]   
+    (cond [colisao-parede-acima?
+           (make-tiro dy  LIMITE-ACI (+ (tiro-y t)))])))
+
+
+
+;;EXEMPLOS/TESTES
+;(check-equal? <chamada da funcao> <retorno esperado>)
+(check-equal? (proximo-tiro (make-tiro POS-Y-T 0 5))
+              (make-tiro 5 2)) ;INICIO
+(check-equal? (proximo-tiro
+               (make-tiro POS-Y-T (-LIMITE-ACI 10) 5))
+              (make-tiro POS-Y-T???/?????????????????????????????????????
+
+                            
+
+
+;; Jogo -> Jogo
+;; Fazer o Jogo rodar no decorrer do tempo
+;;!!!
+(define (proximo-jogo j)
+  (make-jogo (proximo-canhao (jogo-canhao )) (make-canhao 0 0)));stub
+
+
+
+
+
+
+;; Aliens -> Image
+;; desenha a animacao com os aliens andando  no cenario
+;;(define (desenha-mundo al) empty-image)  ;;protótipo(STUB)
+
+(define (desenha-mundo al)
+  (cond [(>= (alien-dx al) 0)
+         (place-image AL-INICIAL (alien-x al)  CENARIO)]
+        [else
+         (place-image AL-INICIAL (alien-x al) CENARIO)]
+   ))      
+
+;;EXEMPLOS:
+;(check-equal? <chamada da funçao> <retorno esperado>)
+;(check-equal? (desenha-mundo(make-alien 0 15))
+;              (place-image IMG-ALIEN1 0 POS-X CENARIO))
+;(check-equal? (desenha-mundo(make-alien 100 15))
+ ;             (place-image IMG-ALIEN1 100 POS-X CENARIO))
+;(check-equal? (desenha-mundo (make-alien 100 -15))
+;              (place-image IMG-ALIEN1 100 POS-X CENARIO))
+;(check-equal? (desenha-mundo (make-alien LIMITE-DIR -15))
+ ;             (place-image IMG-ALIEN1 LIMITE-DIR POS-Y CENARIO))
+;(check-equal? (desenha-mundo (make-alien 0 0))
+ ;             (place-image IMG-ALIEN1 0 POS-Y CENARIO))
+;//
+
+
+
+;(define (desenha-jogo j) j)
+;(desenha alien-azul (jogo-space)) ;stub
+
+
+
+
+;; EstadoMundo -> Boolean
+;; define se o jogo deve ser terminado quando ...
+;; !!!
+(define (terminou? estado) false)   ;;protótipo
+
+
+
+;; Alien KeyEvent -> Alien
+;; Quando teclar N produz alien na posicao 0
+;;(define (trata-tecla1 al ke) (make-alien 0 0)) 
+
+(define (trata-tecla al ke)
+;;  (cond [(key=? ke " ") 0]
+;;        (make-alien (alien-x al) (- (alien-dx al))
+;;        [else
+;;         estado])))     ;;protótipo
+
+;;EXEMPLOS
+(check-equal? (trata-tecla (make-alien 100 15) " ")
+              (make-alien 100 -15))
+(check-equal? (trata-tecla (make-alien 100 100)"n")
+              (make-alien 100 -100))
+
+;;//////....
+
+  
+
+;;Jogo KeyEvent -> Jogo
+;; Gerencia eventos de teclado do jogo
+;; !!!
+
+(define (trata-tecla1 j ke)
+  (make-jogo (trata-tecla-alien (jogo-alien j) ke)
+             (jogo-alien  j)
+             (jogo-game-over? j)
+             (jogo-pontuacao j)));stub
+
+
+
+
+;; EstadoMundo Integer Integer MouseEvent -> EstadoMundo
+;; Quando fazer ... nas posições x y no mouse produz ...   <apagar caso não precise usar>
+(define (trata-mouse estado x y me)
+  (cond [(mouse=? me "button-down") estado]
+        [else
+         estado]))    ;;protótipo

@@ -1,0 +1,40 @@
+
+(require rackunit)
+(require 2htdp/image)
+(require 2htdp/universe)
+;inclua outros pacotes ou arquivos necessários usando (require ...)
+
+(provide (all-defined-out)) ;permite que outros arquivos importem deste
+
+
+;; =================
+;;CONSTANTES:
+
+(define ALTURA 700)
+(define COMP 700)
+(define LIMITE-DIR COMP)
+(define LIMITE-ESQ 0)
+(define CENARIO (empty-scene COMP ALTURA )) ;; Cena vazia
+
+;;PERSONAGENS:
+(define IMG-ALIEN1 (bitmap "alien-azul.png"))
+(define IMG-ALIEN2 (bitmap"alien-roxo.png"))
+(define IMG-ALIEN3 (bitmap"alien-verde.png"))
+(define INTERVALO_X 45);espaço entre os aliens ou a entre alien e parede no eixo x
+(define INTERVALO_Y 10);espaço entre os aliens ou a entre alien e parede no eixo y
+
+(define IMG-CANHAO(bitmap"canhao.png"))
+(define DEF_SPEED 10) ; velocidade
+
+;;multiplos tiros
+(define IMG-TIROS(bitmap"tiros.png"))
+
+(define IMG-GAME-OVER(bitmap"game-over.jpg"))
+(define IMG-GAME-OVER1
+  (place-image IMG-GAME-OVER (/ COMP 2) ( / ALTURA 2) CENARIO))  ;;Lugar da imagem Game-Over
+  
+(define IMG-START(bitmap"start.png")) ;; para o inicio do jogo ira ter esta imagem
+(define IMG-WIN(bitmap"youwin.png"))  ;;Caso o jogador ganhe ira surgir esta imagem 
+
+         
+            

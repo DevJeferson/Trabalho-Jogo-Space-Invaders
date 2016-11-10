@@ -1,0 +1,52 @@
+#lang racket
+(require rackunit)
+(require "constantes.rkt")
+(require "dados.rkt")
+(require "jogo.rkt")
+
+
+;; Constantes usadas nos testes
+;; ...
+
+;; Testes (separe-os por função, não misture):
+
+;;EXEMPLOS/TESTES
+;(check-equal? <chamada da funcao> <retorno esperado>)
+(check-equal? (proximo-canhao (make-canhao 0 15))
+              (make-canhao 15 15)) ;INICIO(Metade da tela)
+(check-equal? (proximo-canhao (make-canhao 15 15))
+              (make-canhao 30 15)) ;INDO(esquerda ou direita)
+(check-equal? (proximo-canhao (make-canhao (- COMP 5) 15))
+              (make-canhao COMP -15)) ;PASSANDO DO LIMITE INDO
+(check-equal? (proximo-canhao (make-canhao 500 -15))
+              (make-canhao 490 -15 )) ;VOLTANDO
+(check-equal? (proximo-canhao (make-canhao 5 -15))
+              (make-canhao 0 15)) ;PASSANDO DO LIMITE VOLTANDO
+(check-equal? (proximo-canhao (make-canhao (- COMP 15) 15))
+              (make-canhao COMP -15)) ;LIMITE INDO
+(check-equal? (proximo-canhao (make-canhao 15 -15))
+              (make-canhao 0 15))  ;LIMITE VOLTANDO
+
+
+;(check-equal? <chamada da funcao> <retorno esperado>)
+(check-equal? (proximo-alien (make-alien 0 15)) 
+              (make-alien 10 15))  ;INICIO
+(check-equal? (proximo-alien (make-alien 10 15)) 
+              (make-alien 20 15)) ;INDO
+(check-equal? (proximo-alien (make-alien (- COMP 5) 15)) 
+              (make-alien COMP -10))  ;PASSANDO DO LIMITE INDO
+(check-equal? (proximo-alien (make-alien 620 -10)) 
+              (make-alien 600 -10)) ;VOLTANDO
+(check-equal? (proximo-alien (make-alien 5 -10)) 
+              (make-alien 0 10)) ;PASSANDO DO LIMITE VOLTANDO
+(check-equal? (proximo-alien (make-alien (- COMP 10) 10))
+              (make-alien COMP -10)) ;LIMITE INDO
+(check-equal? (proxim0-alien (make-alien 10 -10)) 
+              (make-alien 0 10)) ;LIMITE VOLTANDO
+
+
+
+
+;Exemplos
+(check-equal? (colisao-alien-tiro)
+

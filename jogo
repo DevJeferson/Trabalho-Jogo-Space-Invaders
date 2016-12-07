@@ -1,230 +1,331 @@
-; Este arquivo dever conter as definições das funções do jogo (com exceção da main).
-; As definições devem incluir assinatura, propósito, protótipo e templates utilizados.
-
-
+#lang racket
+;;(require mrlib/gif)
 (require 2htdp/image)
 (require 2htdp/universe)
-(require rackunit)
 (require "constantes.rkt") ;importa as constantes definidas no arquivo "constantes.rkt"
 (require "dados.rkt") ;importa as definições de dados definidas no arquivo "dados.rkt"
 
 (provide (all-defined-out)) ;permite que outros arquivos importem deste
 
-;;Funções:
-;; Jogo -> Jogo
-;; inicie o mundo com (main)
-;; !!!
-;(define (tock estado) estado)    ;;protótipo
-
-(define (main)
-  (big-bang JOGO-INICIAL           ;jogo (estado inicial do mundo)
-            (on-tick proximo-jogo)   ; jogo -> jogo
-            ;(retorna um novo estado do mundo dado o atual a cada tick do clock)
-            
-            (to-draw desenha-mundo) ; jogo -> image
-            ;(retorna uma imagem que representa o estado atual do mundo)
-            
-            (on-key trata-tecla) ; Jogo KeyEvent -> Jogo
-            ;(retorna um novo estado do mundo dado o estado atual e uma interação com o teclado)
-            ))
 
 
+;; proximo-jogo : Jogo -> Jogo
+;; atualiza o jogo
 
-;;<TipoEntrada> -> <TipoSaida>
-;;canhão -> canhão 
-;;Mover canhao dx passos no eixo x
-;;(define (proximo-canhao c ) (make-canhao 0 0)) ;prototipo /versao que falha
-
-(define (proximo-canhao c)
-  (local [
-          (define proximo-x
-            (+ (canhao-x c) (canhao-dx c)))
-          (define colisao-parede-direita?
-            (>= proximo-x LIMITE-DIR))
-          (define colisao-parede-esquerda?
-            (<= proximo-x LIMITE-ESQ)) ]
-    
-    (cond [colisao-parede-direita?
-           (make-canhao LIMITE-DIR (- (canhao-dx c))) ]
-          [colisao-parede-esquerda?
-           (make-canhao LIMITE-ESQ (- (canhao-dx c))) ]
-          [else
-           (make-canhao proximo-x (canhao-dx c))])))
-
-;;EXEMPLOS/TESTES
-;(check-equal? <chamada da funcao> <retorno esperado>)
-(check-equal? (proximo-canhao (make-canhao 0 15))
-              (make-canhao 15 15)) ;INICIO(Metade da tela)
-(check-equal? (proximo-canhao (make-canhao 15 15))
-              (make-canhao 30 15)) ;INDO(esquerda ou direita)
-(check-equal? (proximo-canhao (make-canhao (- COMP 5) 15))
-              (make-canhao COMP -15)) ;PASSANDO DO LIMITE INDO
-(check-equal? (proximo-canhao (make-canhao 500 -15))
-              (make-canhao 490 -15 )) ;VOLTANDO
-(check-equal? (proximo-canhao (make-canhao 5 -15))
-              (make-canhao 0 15)) ;PASSANDO DO LIMITE VOLTANDO
-(check-equal? (proximo-canhao (make-canhao (- COMP 15) 15))
-              (make-canhao COMP -15)) ;LIMITE INDO
-(check-equal? (proximo-canhao (make-canhao 15 -15))
-              (make-canhao 0 15))  ;LIMITE VOLTANDO
-
-
-
-
-;;<TipoEntrada> -> <TipoSaida>
-;;alien -> alien 
-;;Mover alien dx passos no eixo x
-;;(define (proximo-alien al ) (make-alien 0 0)) ;prototipo /versao que falha
-
-(define (proximo-alien al)
-  (local [
-          (define proximo-x
-            (+ (alien-x al) (alien-dx al)))
-          (define colisao-parede-direita?
-            (>= proximo-x LIMITE-DIR))
-          (define colisao-parede-esquerda?
-            (<= proximo-x LIMITE-ESQ))]   
-    (cond [colisao-parede-direita?
-           (make-alien dx  LIMITE-DIR (+ (alien-y al))) ]
-          [colisao-parede-esquerda?
-           (make-alien dx LIMITE-ESQ (+ (alien-y al))) ]
-          [else
-           (make-alien proximo-x (alien-dx al))])))
-
-;;Exemplos
-;(check-equal? <chamada da funcao> <retorno esperado>)
-(check-equal? (proximo-alien (make-alien 0 15)) 
-              (make-alien 10 15))  ;INICIO
-(check-equal? (proximo-alien (make-alien 10 15)) 
-              (make-alien 20 15)) ;INDO
-(check-equal? (proximo-alien (make-alien (- COMP 5) 15)) 
-              (make-alien COMP -10))  ;PASSANDO DO LIMITE INDO
-(check-equal? (proximo-alien (make-alien 620 -10)) 
-              (make-alien 600 -10)) ;VOLTANDO
-(check-equal? (proximo-alien (make-alien 5 -10)) 
-              (make-alien 0 10)) ;PASSANDO DO LIMITE VOLTANDO
-(check-equal? (proximo-alien (make-alien (- COMP 10) 10))
-              (make-alien COMP -10)) ;LIMITE INDO
-(check-equal? (proximo-alien (make-alien 10 -10)) 
-              (make-alien 0 10)) ;LIMITE VOLTANDO
-
-
-;;<TipoEntrada> -> <TipoSaida>
-;;tiro -> tiro
-;;Mover tiro dy passos no eixo y
-
-
-(define (proximo-tiro t)
-  (local [
-          (define proximo-y
-            (+ (tiro-y t) (tiro-dy t)))
-          (define colisao-tiro?
-            (>= proximo-y LIMITE-TIRO))
-          (define colisao-parede-acima?
-            (<= proximo-y LIMITE-ACI))]   
-    (cond [colisao-parede-acima?
-           (make-tiro dy  LIMITE-ACI (+ (tiro-y t)))])))
-
-
-
-;;EXEMPLOS/TESTES
-;(check-equal? <chamada da funcao> <retorno esperado>)
-(check-equal? (proximo-tiro (make-tiro POS-Y-T 0 5))
-              (make-tiro 5 2)) ;INICIO
-(check-equal? (proximo-tiro
-               (make-tiro POS-Y-T (-LIMITE-ACI 10) 5))
-              (make-tiro POS-Y-T???/?????????????????????????????????????
-
-                            
-
-
-;; Jogo -> Jogo
-;; Fazer o Jogo rodar no decorrer do tempo
-;;!!!
+;(define (proximo-jogo j)  j)
 (define (proximo-jogo j)
-  (make-jogo (proximo-canhao (jogo-canhao )) (make-canhao 0 0)));stub
-
-
-
-
-
-
-;; Aliens -> Image
-;; desenha a animacao com os aliens andando  no cenario
-;;(define (desenha-mundo al) empty-image)  ;;protótipo(STUB)
-
-(define (desenha-mundo al)
-  (cond [(>= (alien-dx al) 0)
-         (place-image AL-INICIAL (alien-x al)  CENARIO)]
-        [else
-         (place-image AL-INICIAL (alien-x al) CENARIO)]
-   ))      
-
-;;EXEMPLOS:
-;(check-equal? <chamada da funçao> <retorno esperado>)
-;(check-equal? (desenha-mundo(make-alien 0 15))
-;              (place-image IMG-ALIEN1 0 POS-X CENARIO))
-;(check-equal? (desenha-mundo(make-alien 100 15))
- ;             (place-image IMG-ALIEN1 100 POS-X CENARIO))
-;(check-equal? (desenha-mundo (make-alien 100 -15))
-;              (place-image IMG-ALIEN1 100 POS-X CENARIO))
-;(check-equal? (desenha-mundo (make-alien LIMITE-DIR -15))
- ;             (place-image IMG-ALIEN1 LIMITE-DIR POS-Y CENARIO))
-;(check-equal? (desenha-mundo (make-alien 0 0))
- ;             (place-image IMG-ALIEN1 0 POS-Y CENARIO))
-;//
-
-
-
-;(define (desenha-jogo j) j)
-;(desenha alien-azul (jogo-space)) ;stub
-
-
-
-
-;; EstadoMundo -> Boolean
-;; define se o jogo deve ser terminado quando ...
-;; !!!
-(define (terminou? estado) false)   ;;protótipo
-
-
-
-;; Alien KeyEvent -> Alien
-;; Quando teclar N produz alien na posicao 0
-;;(define (trata-tecla1 al ke) (make-alien 0 0)) 
-
-(define (trata-tecla al ke)
-;;  (cond [(key=? ke " ") 0]
-;;        (make-alien (alien-x al) (- (alien-dx al))
-;;        [else
-;;         estado])))     ;;protótipo
-
-;;EXEMPLOS
-(check-equal? (trata-tecla (make-alien 100 15) " ")
-              (make-alien 100 -15))
-(check-equal? (trata-tecla (make-alien 100 100)"n")
-              (make-alien 100 -100))
-
-;;//////....
-
-  
-
-;;Jogo KeyEvent -> Jogo
-;; Gerencia eventos de teclado do jogo
-;; !!!
-
-(define (trata-tecla1 j ke)
-  (make-jogo (trata-tecla-alien (jogo-alien j) ke)
-             (jogo-alien  j)
+  (local
+    [(define acertou-alien? (colisao-tiros-alien? (jogo-ltiros j) (jogo-laliens j)))
+     ]
+    (cond [(colisao-algum-alien-nave? (jogo-n j) (jogo-laliens j))
+         (make-jogo (jogo-n j)
+                    (jogo-laliens j)
+                    (jogo-ltiros j)
+                    #true
+                   )]
+   [else             
+  (make-jogo ( jogo-n j)
+             (cond
+                     [(list? acertou-alien?)
+                          (proximos-aliens
+                           (remove (second acertou-alien?) (jogo-laliens j)))]                         
+                     [else
+                      (proximos-aliens (jogo-laliens j))])
+             
+             (if (list? acertou-alien?)
+                       (proximos-tiros
+                        (remove (first acertou-alien?) (jogo-ltiros j)))
+             (proximos-tiros (jogo-ltiros j)))
              (jogo-game-over? j)
-             (jogo-pontuacao j)));stub
+          )])))
 
 
+;; desenha-jogo : Jogo -> Image
+;; desenha o jogo
+
+(define (desenha-jogo j)
+  (if (jogo-game-over? j) TELA-GAME-OVER
+  (overlay
+  (desenha-nave (jogo-n j))
+  (desenha-tiros (jogo-ltiros j))
+  (desenha-aliens ( jogo-laliens j))
+  CENARIO3
+  )))
+
+
+;; distancia : Numero Numero Numero Numero -> Numero
+;; calcula distancia
+(define (distancia x1 y1 x2 y2)
+  (sqrt (+ (sqr (- x2 x1)) (sqr (- y2 y1)))))
+
+
+;; colisao-algum-alien-nave? : nave aliens -> Boolean
+;; verifica se nave colidiu com algum alien
+
+(define (colisao-algum-alien-nave? n laliens)
+  (ormap (lambda (al) (colisao-nave-alien? n al)) laliens))
+
+
+;; colisao-nave-alien? : nave alien -> Boolean
+;; verifica se a nave e o alien colidiram
+;!!!
+;(define (colisao-nave-alien? n al) #false)
+(define (colisao-nave-alien? n al)
+  (<= (distancia n NAVE_POSY
+             (alien-x al) (alien-y al))
+      (+ MEIO-H-NAVE MEIO-H-ALIEN)))
+
+
+
+
+
+
+
+
+;; EstadoMundo KeyEvent -> EstadoMundo
+;; quando tecla ... é pressionada produz ...  <apagar caso não precise usar>
+(define (trata-tecla estado ke)
+  (cond [(key=? ke " ") estado]
+        [else
+         estado]))     ;;protótipo
 
 
 ;; EstadoMundo Integer Integer MouseEvent -> EstadoMundo
 ;; Quando fazer ... nas posições x y no mouse produz ...   <apagar caso não precise usar>
 (define (trata-mouse estado x y me)
-  (cond [(mouse=? me "button-down") estado]
+(cond [(mouse=? me "button-down") estado]
+      [else
+       estado]))    ;;protótipo
+
+
+
+
+;;;;;;;;
+;;;;;;
+
+
+
+
+
+
+
+;; trata-tecla-nave: nave KeyEnent -> nave
+;; quando tecla de setinha esquerda ou direta e presionada a nave vai
+;; na direcao presionada
+
+(define (trata-tecla-nave n ke)
+  (cond [(key=? ke "right")(mover-direita n)]
+        [(key=? ke "left")(mover-esquerda n)]
+         [else n]))
+
+
+;; Nave -> Nave
+(define (main-nave n)
+  (big-bang n
+            (on-key trata-tecla-nave)    ; nave KeyEvent -> nave
+            (to-draw desenha-nave))) ;Nave-> Imagem
+
+
+;; tocou-parede-esquerda?: Nave -> boolean
+; determina se o objeto tocou a parede esquerda
+(define (tocou-parede-esquerda? n) 
+  (cond
+    [(<= n  CANTO_ESQUERDO) true]
+    [else false]
+    ))
+
+
+
+;; tocou-parede-direita? : Nave -> boolean
+; determina se o objeto tocou a parede direita
+(define (tocou-parede-direita? n) 
+  (cond
+    [(>= n CANTO_DIREITO) true]
+    [else false]
+    ))
+
+
+;; mover-esquerda : Nave -> Nave
+; move a nave para esquerda 1 px
+(define (mover-esquerda n)
+  (if (tocou-parede-esquerda? n)
+      n
+      (- n VELOCIDADE) 
+      ))
+
+;; mover-right : nave -> nave
+; move a nave para direita 1 px
+(define (mover-direita n)
+  (if (tocou-parede-direita? n)
+      n
+      (+ n VELOCIDADE)
+      ))
+
+
+
+
+
+
+;; proximos-tiros : Tiros -> Tiros
+(define (proximos-tiros ldt)
+  (filter (lambda (t) (and (>= (tiro-y t) 0) (<= (tiro-y t) LARGURA)))
+          (map proximo-tiro ldt)))
+
+
+;; proximo-tiro : Tiro -> Tiro
+(define (proximo-tiro t)
+  (make-tiro (- (tiro-y t) (tiro-dy t)) (tiro-dy t) (tiro-x t)))
+
+
+
+;; desenha-tiro : tiro -> Image
+;; desenha o tiro no cenario
+
+(define (desenha-tiro t)
+  (place-image IMG-TIRO (tiro-x t) (tiro-y t) CENARIO))
+
+
+
+;; desenha-tiros : tiros -> Image
+;; desenha os tiros da lista no cenario
+(define (desenha-tiros ldt)
+  (foldl overlay CENARIO (map desenha-tiro ldt)))
+
+
+;; trata-tecla-jogo : tiro KeyEvent -> tiro
+;;ao apertar espaço um tiro e lançado(nao ha tiros simultaneos)
+(define (trata-tecla-tiro t n ke)
+  (cond
+    [(key=? ke " ")
+     (make-tiro NAVE_POSY
+           (tiro-dy t)
+           n)]
+    [else t]))
+
+;; trata-tecla-tiros : tiro KeyEvent -> tiros
+;;ao apertar espaço um tiro e lançado podendo haver tiros simulltaneos(varios tiros na tela)
+(define (trata-tecla-tiros lt n ke)
+  (cond
+    [(key=? ke " ")
+     (cons (make-tiro NAVE_POSY
+                      D-TIRO n) lt)]
+    [else lt]))
+
+
+
+;;ALIEN
+;; desenha-alien : alien -> Image
+;; desenha o alien
+(define (desenha-alien al)
+  (place-image AL_IMG (alien-x al) (alien-y al) CENARIO))
+
+;; proximo-alien : alien -> alien
+;; recebe um alien na posicao x e retorna um alien com posição
+;; x atualizada com o dx e ao chegar no limite do cenario atualiza o y do alien
+;(define (proximo-alien al) al)
+(define (proximo-alien al)
+  (cond 
+        [(> (alien-x al) CANTO_DIRal)
+         (make-alien CANTO_DIRal (- (alien-dx al))
+                    (+ (alien-y al)(alien-dy al))
+                     (alien-dy al))]
+        [(< (alien-x al)CANTO_ESQal)
+         (make-alien CANTO_ESQal (- (alien-dx al))
+                    (+ (alien-y al)(alien-dy al))
+                     (alien-dy al))]
         [else
-         estado]))    ;;protótipo
+          (make-alien (+ (alien-x al) (alien-dx al))
+                         (alien-dx al)
+                         (alien-y al)
+                         (alien-dy al))]))
+
+; exemplos / testes
+
+
+
+(define (proximos-aliens lista-al)
+  (map proximo-alien lista-al))
+
+
+
+;; desenha-aliens : Aliens -> Image
+;; desenha os aliens da lista no cenario
+(define (desenha-aliens lista-al)
+  (cond [(empty? lista-al) CENARIO]
+        [else (place-image AL_IMG (alien-x (first lista-al)) (alien-y (first lista-al)) (desenha-aliens(rest lista-al)))]))
+        
+
+
+
+;; Alien -> Alien
+;; inicie o mundo com (main-alien AL-INICIAL)
+
+(define (main-alien al)
+  (big-bang al               ; Alien   
+            (on-tick   proximos-aliens)     ; alien -> alien   
+                                 
+            (to-draw   desenha-aliens)))   ; alien -> Image  
+
+
+
+
+
+
+
+;                                      JOG
+
+
+
+
+
+
+
+;; trata-tecla-jogo : Jogo KeyEvent -> Jogo
+;;usando trata tecla da nave e do tiro
+(define (trata-tecla-jogo jg ke)
+  (cond [(and (jogo-game-over? jg) (key=? ke "\r"))
+         jogo-inicial2]
+        [else
+  (make-jogo (trata-tecla-nave (jogo-n jg) ke)
+             (jogo-laliens jg)
+             (trata-tecla-tiros (jogo-ltiros jg)(jogo-n jg ) ke)
+             (jogo-game-over? jg))]))
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; colisao-tiros-alien? : ListaDeTiro ListaDeAliens -> (pair Tiro Alien) | false
+;; verifica se tiros acertaram algum dos aliens
+
+(define (colisao-tiros-alien? laliens ltiros)
+  (local
+    [
+     (define (colisao-tiro-alien? t al)
+       (if (<= (distancia (tiro-x t) (tiro-y t)
+                          (alien-x al) (alien-y al))
+               (+ MEIO-H-TIRO MEIO-H-ALIEN))
+           (list t al)
+           #false))
+
+     (define (cria-pares item lista)
+       (map (lambda (item2) (list item item2)) lista))
+
+     (define (produto-cartesiano list1 list2)
+       (cond [(empty? list1) empty]
+             [else
+              (append (cria-pares (first list1) list2)
+                      (produto-cartesiano (rest list1) list2))]))
+
+     (define busca
+       (memf (lambda (par) (colisao-tiro-alien? (first par) (second par)))
+           (produto-cartesiano laliens ltiros)))
+     
+     ]
+    (if (false? busca)
+        #false
+        (first busca))))
+
+

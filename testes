@@ -1,52 +1,113 @@
 #lang racket
+(require mrlib/gif)
 (require rackunit)
+(require rackunit/text-ui)
 (require "constantes.rkt")
 (require "dados.rkt")
 (require "jogo.rkt")
 
+;_____________________________________________________________TESTES_________________________________________________________________
 
-;; Constantes usadas nos testes
-;; ...
+#;
+(define tock-tests
+  (test-suite
+   "tock tests"
+   ...))
 
-;; Testes (separe-os por função, não misture):
+#;
+(define desenha-tests
+  (test-suite
+   "desenha tests"
+   ...))
 
-;;EXEMPLOS/TESTES
-;(check-equal? <chamada da funcao> <retorno esperado>)
-(check-equal? (proximo-canhao (make-canhao 0 15))
-              (make-canhao 15 15)) ;INICIO(Metade da tela)
-(check-equal? (proximo-canhao (make-canhao 15 15))
-              (make-canhao 30 15)) ;INDO(esquerda ou direita)
-(check-equal? (proximo-canhao (make-canhao (- COMP 5) 15))
-              (make-canhao COMP -15)) ;PASSANDO DO LIMITE INDO
-(check-equal? (proximo-canhao (make-canhao 500 -15))
-              (make-canhao 490 -15 )) ;VOLTANDO
-(check-equal? (proximo-canhao (make-canhao 5 -15))
-              (make-canhao 0 15)) ;PASSANDO DO LIMITE VOLTANDO
-(check-equal? (proximo-canhao (make-canhao (- COMP 15) 15))
-              (make-canhao COMP -15)) ;LIMITE INDO
-(check-equal? (proximo-canhao (make-canhao 15 -15))
-              (make-canhao 0 15))  ;LIMITE VOLTANDO
+#;
+(define trata-tecla-tests
+  (test-suite
+   "trata-tecla tests"
+   ...))
 
+#;
+(define trata-mouse-tests
+  (test-suite
+   "trata-mouse tests"
+   ...))
 
-;(check-equal? <chamada da funcao> <retorno esperado>)
-(check-equal? (proximo-alien (make-alien 0 15)) 
-              (make-alien 10 15))  ;INICIO
-(check-equal? (proximo-alien (make-alien 10 15)) 
-              (make-alien 20 15)) ;INDO
-(check-equal? (proximo-alien (make-alien (- COMP 5) 15)) 
-              (make-alien COMP -10))  ;PASSANDO DO LIMITE INDO
-(check-equal? (proximo-alien (make-alien 620 -10)) 
-              (make-alien 600 -10)) ;VOLTANDO
-(check-equal? (proximo-alien (make-alien 5 -10)) 
-              (make-alien 0 10)) ;PASSANDO DO LIMITE VOLTANDO
-(check-equal? (proximo-alien (make-alien (- COMP 10) 10))
-              (make-alien COMP -10)) ;LIMITE INDO
-(check-equal? (proxim0-alien (make-alien 10 -10)) 
-              (make-alien 0 10)) ;LIMITE VOLTANDO
+#;
+(define terminou?-tests
+  (test-suite
+   "terminou? tests"
+   ...))
+
+;; Adicione os testes restantes
 
 
 
+;; ---------------------------------------------------------------------
 
-;Exemplos
-(check-equal? (colisao-alien-tiro)
+;; Função que executa um grupo de testes.
+(define (executar-testes . testes)
+  (run-tests (test-suite "Todos os testes" testes))
+  (void))
+
+;; Chama a função para executar os testes.
+#;
+(executar-testes tock-tests
+                 desenha-tests
+                 trata-tecla-tests
+                 trata-mouse-tests
+                 terminou?-tests)
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;________
+
+;Testes para mover a nave tanto para esquerda como para direita
+
+(check-expect (trata-tecla-nave 100 "left") (- 100 VELOCIDADE))
+(check-expect (trata-tecla-nave 100 "right") (+ 100 VELOCIDADE))
+
+
+;Testes para saber se a nave tocou o canto esquerdo ou o direito
+
+(check-expect (tocou-parede-esquerda? CANTO_ESQUERDO) true)
+(check-expect (tocou-parede-esquerda? 200) false)
+
+
+;;
+(check-expect (tocou-parede-direita? 10) false)
+(check-expect (tocou-parede-direita? CANTO_DIREITO) true)
+
+
+
+;;
+(check-expect (mover-esquerda 200) (- 200 VELOCIDADE))
+(check-expect (mover-esquerda CANTO_ESQUERDO) CANTO_ESQUERDO)
+
+
+;;
+(check-expect (mover-direita 10) (+ 10 VELOCIDADE))
+(check-expect (mover-direita CANTO_DIREITO) CANTO_DIREITO)
+
+
+
+
+;;Testes para checar a ...
+(check-expect (distancia 3 0 0 4) 5)
+
+
+
+#;
+(check-expect (colisao-nave-alien?
+                inicia-nave
+               (make-alien( NAVE_POSX 0 NAVE_POSY 0))
+              #true))
+
+(check-expect (colisao-nave-alien?
+               inicia-nave
+               AL-INICIAL)
+              #false)
 

@@ -1,109 +1,147 @@
 #lang racket
-;;aqui fica as informações que mudam
-;; Arquivo para definição dos tipos de dados do programa.
-
+(require mrlib/gif)
+;;Arquivo para definição dos tipos de dados do programa.
 (require 2htdp/image)
-;inclua outros pacotes ou arquivos necessários usando (require ...)
 (require "constantes.rkt")
-
+;inclua outros pacotes ou arquivos necessários usando (require ...)
 (provide (all-defined-out)) ;permite que outros arquivos importem deste
 
-;; =================
 ;; Definições de dados:
 
-;; EstadoMundo é JOGO-SPACE INICIAL ()
+;; EstadoMundo é ... (dê um nome melhor para EstadoMundo) 
 
-;Definições de dados:
-(define-struct alien (x y dx pontos) #:transparent) ;estrutura
-;;Aliens é (make-aliens Numero[0,inf.] Numero)
+;_____________________________________________________________________________________________________________________________-
+
+;                                                               DEFINICAO DA NAVE
+(define-struct nave (x dx y))
+
+(define NAVE-INICIAL (make-nave NAVE_POSX 10 NAVE_POSY))
+
+;; desenha-nave: nave -> Image
+;; retorna a representação do cenário com a nave
+(define (desenha-nave n)
+  (place-image NAVE_IMG (+ n 0) NAVE_POSY CENARIO))
+
+
+
+
+
+
+
+;________________________________________________________________________________________________________________________________
+
+;                                                         DEFINICAO DO TIRO
+
+
+
+(define-struct tiro (y dy x))
+
+
+;; Tiro é (make-tiro Natural Inteiro Natural)
+;; interp. um tiro que apenas na horizontal
+
+
+
+(define TIRO-PADRAO (make-tiro 100 D-TIRO  100))
+(define TIRO1 (make-tiro 50 D-TIRO  50))
+(define TIRO2 (make-tiro 200 D-TIRO 200))
+(define TIRO3 (make-tiro 500 D-TIRO 450))
+
+;;interp. conjunto de tiros
+(define TIROS1 empty)
+(define TIROS2 (list TIRO1))
+(define TIROS3 (list TIRO1 TIRO2 TIRO3))
+
+
+
+
+
+
+
+
+(define-struct alien (x dx y dy)) 
+;;Aliens é (make-alien Natural Natural Inteiro)
 ;;interp. a estrutura representa alguns aliens com posicao x e y no cenario
 ;;e velocidade(deslocamento) dx no eixo x
+
+(define AL-MEIO (make-alien X-AL 0 (/ ALTURA 2) DY-AL))
+
 ;;Exemplos:
+;Primeira fileira
 
-(define AL-INICIAL (make-alien 10 10 5 8))   ;;make cria uma nova estrutura de dados, fica atualizando 
+(define AL-INICIAL (make-alien 17 5 20 30))
+(define AL-INI(make-alien 60 5 20 30))
+(define al-dois(make-alien 110 5 20 30))
+(define al-tres(make-alien 160 5 20 30))
+(define quatro (make-alien 210 5 20 30))
+(define cinco (make-alien 260 5 20 30))
+(define seis (make-alien 310 5 20 30))
+(define sete (make-alien 360 5 20 30))
+(define oito (make-alien 410 5 20 30))
+(define nove (make-alien 460 5 20 30))
+
+;Segunda fileira
+(define AL-INICIAL0 (make-alien 17 5 40 30))
+(define AL-INI0 (make-alien 60 5 40 30))
+(define al-dois0 (make-alien 110 5 40 30))
+(define al-tres0 (make-alien 160 5 40 30))
+(define quatro0 (make-alien 210 5 40 30))
+(define cinco0 (make-alien 260 5 40 30))
+(define seis0 (make-alien 310 5 40 30))
+(define sete0 (make-alien 360 5 40 30))
+(define oito0 (make-alien 410 5 40 30))
+(define nove0 (make-alien 460 5 40 30))
+
+;Terceira fileira
+(define AL-INICIAL1 (make-alien 17 5 60 30))
+(define AL-INI1 (make-alien 60 5 60 30))
+(define al-dois1 (make-alien 110 5 60 30))
+(define al-tres1 (make-alien 160 5 60 30))
+(define quatro1 (make-alien 210 5 60 30))
+(define cinco1 (make-alien 260 5 60 30))
+(define seis1 (make-alien 310 5 60 30))
+(define sete1 (make-alien 360 5 60 30))
+(define oito1 (make-alien 410 5 60 30))
+(define nove1 (make-alien 460 5 60 30))
+
+;Aleatorio
+(define AL-INICIALa (make-alien 17 20 10 30))
+(define AL-INIa (make-alien 60 10 100 30))
+(define al-doisa (make-alien 110 6 200 30))
+(define al-tresa (make-alien 160 8 150 30))
+(define quatroa (make-alien 210 15 80 30))
+(define cincoa (make-alien 260 3 250 30))
+
+;_______________________________________________________________________________________________________________________________-
+
+;;DEFINICAO DA LISTA DE ALIENS
+
+(define LISTA-ALIENS1 ( list AL-INICIAL AL-INI al-dois al-tres quatro cinco seis sete oito nove))
+(define LISTA-ALIENS2 ( list AL-INICIAL0 AL-INI0 al-dois0 al-tres0 quatro0 cinco0 seis0 sete0 oito0 nove0))
+(define LISTA-ALIENS3 ( list AL-INICIAL1 AL-INI1 al-dois1 al-tres1 quatro1 cinco1 seis1 sete1 oito1 nove1))
+
+
+(define LISTA-ALIENS ( list  AL-INICIAL AL-INI al-dois al-tres quatro cinco seis sete oito nove
+                             AL-INICIALa AL-INIa al-doisa al-tresa quatroa cincoa))
+
+(define LISTA2 (list AL-INICIAL AL-INI))
 #;
-;;Alien (al)
-(define (fn-para-alien-al)
-  (...(alien-x y al)
-      (alien-dx al)
-      ))
+(define AL-INICIAL (make-alien X-AL 
+(define AL-MEIO
+(define AL-ANTES-DESCER ...
+(define AL-DESCEU...
+(define AL-CHEGANDO..))))))
 
 
-(define AL1 (make-alien 50 10 5 20))
-(define AL2 (make-alien 90 10 5 10))
+;__
 
+( define-struct jogo (n laliens ltiros game-over?))
+#;(define (fn-para-jogo j)
+  (...(jogo-n  j)
+      (jogo-laliens j)
+      (jogo-ltiros j)
+      (jogo-game-over? j)))
 
-
-;;Pontuação é inteiro
-;;interp. a pontuação do jogo
-;;EXEMPLOS:
-;Pontuacao(p)
-(define P-INICIAL 0)
-(define P  20)
-#;
-(define (fn-para-pontuação p)
-  (....p))
-
-
-;;CANHAO (c)  
-(define-struct canhao( x dx))
-(define CANHAO-INICIAL(make-canhao (/ COMP 2)10))
-(define CANHAO-INO(make-canhao 2 10))
-(define CANHAO-VORTANO(make-canhao -2 10))
-#;
-(define(fn-para-canhao d)
-  (...(canhao-x c) (canhao-dx c)))
-
-
-;;Tiros(t)
-(define-struct tiro (x y existe?) )
-
-(define T-INICIAL(make-tiro -1 -1 #f ))
-(define T-SUBINDO(make-tiro 100  50 #t))
-(define T-SUBINDO-FINAL(make-tiro 20 40  #t))
-(define TIRO_SPEED 5)
-
-#;
-(define (fn-para-tiro t)
-  (...(tiro-y t)
-      (tiro-dy t)
-      ))
-
-
-
-;;ListaDeALiens é um desses:
-;; - empty
-;; -(cons Alien ListaDeAlien)
-;;Exemplos:
-(define LDA0 empty)
-(define LDA1(cons AL-INICIAL empty))
-(define LDA2(list AL-INICIAL AL1 AL2 ))
-             
-#;
-(define(fn-para-lda )
-  (cond [(empty? lda) (...)]
-        [else (...(first lda)
-                  (fn-para-lda (rest lda)))])) ;;função recursiva(fn-para-lda)
-  
-                  
-  
-;;Fim-de-jogo                
-(define-struct jogo(canhao tiro aliens game-over? pontuação))
-;;jogo é(make-jogo  alien canhao Boolean Pontuaçao)
-;;interp. um jogo composto pelos aliens(inimigos), o canhao(personagem),
-;;uma flag que indica se jogo acabou(game over), e a pontuacao
-;;Exemplos
-
-(define JOGO-INICIAL(make-jogo CANHAO-INICIAL T-INICIAL LDA2 #f 0))
-;(define JOGO-MEIO (make-jogo ALIEN-VORTANO-FINAL LDA2 #f 200))
-;(define JOGO-GAME-OVER (make-jogo ALIEN-VORTANO-FINAL T-INICIAL #t 200))
-#;
-
-(define (fn-para jogo j)
-  (... (jogo-alien j)
-       (jogo-canhao j)
-       (jogo-game-over? j)
-       (jogo-pontuacao j)))
-
-
-  
+(define jogo-inicial1 (make-jogo  inicia-nave LISTA2 TIROS3 #false))
+(define jogo-inicial2 (make-jogo inicia-nave LISTA-ALIENS TIROS2 #false))
+(define jogo-inicial3 (make-jogo inicia-nave LISTA-ALIENS TIROS1 #false))

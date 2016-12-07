@@ -1,40 +1,71 @@
-
-(require rackunit)
-(require 2htdp/image)
-(require 2htdp/universe)
-;inclua outros pacotes ou arquivos necessários usando (require ...)
-
+#lang racket
+(require mrlib/gif)
+;|Arquivo para definição das constantes do programa.                   
+(require 2htdp/image)                                                  
+;|inclua outros pacotes ou arquivos necessários usando (require ...)   
 (provide (all-defined-out)) ;permite que outros arquivos importem deste
 
+;;___________________________________________________________________________________________________________________________________
 
-;; =================
-;;CONSTANTES:
+;;                                                  CONSTANTES DO CENARIO
 
-(define ALTURA 700)
-(define COMP 700)
-(define LIMITE-DIR COMP)
-(define LIMITE-ESQ 0)
-(define CENARIO (empty-scene COMP ALTURA )) ;; Cena vazia
+; Definiçoes do cenario do jogo
+(define CENARIO-LARGURA 500)
+(define CENARIO_ALTURA 500)
 
-;;PERSONAGENS:
-(define IMG-ALIEN1 (bitmap "alien-azul.png"))
-(define IMG-ALIEN2 (bitmap"alien-roxo.png"))
-(define IMG-ALIEN3 (bitmap"alien-verde.png"))
-(define INTERVALO_X 45);espaço entre os aliens ou a entre alien e parede no eixo x
-(define INTERVALO_Y 10);espaço entre os aliens ou a entre alien e parede no eixo y
+;(define CENARIO (empty-scene CENARIO-LARGURA CENARIO_ALTURA))
+(define CENARIO (rectangle CENARIO-LARGURA CENARIO_ALTURA "outline" "blue"))
 
-(define IMG-CANHAO(bitmap"canhao.png"))
-(define DEF_SPEED 10) ; velocidade
+(define CENARIO3 (bitmap "fundo5.png"))
+;;(define CENARIO2 (rotate 90(scale 0.5 (bitmap "fundo.png"))))
+;;(define CENARIO3 (scale/xy 1 0.74 (bitmap "espaco.teste.jpg")))
+(define TELA-GAME-OVER (overlay (text "GAME OVER" 30 "red") CENARIO))
+;;(define CENARIO (rectangle (bitmap "universo.jpg")))
 
-;;multiplos tiros
-(define IMG-TIROS(bitmap"tiros.png"))
 
-(define IMG-GAME-OVER(bitmap"game-over.jpg"))
-(define IMG-GAME-OVER1
-  (place-image IMG-GAME-OVER (/ COMP 2) ( / ALTURA 2) CENARIO))  ;;Lugar da imagem Game-Over
-  
-(define IMG-START(bitmap"start.png")) ;; para o inicio do jogo ira ter esta imagem
-(define IMG-WIN(bitmap"youwin.png"))  ;;Caso o jogador ganhe ira surgir esta imagem 
+;___________________________________________________________________________________________________________________________________
 
-         
-            
+;;                                                 CONSTANTES DA NAVE
+;Definicoes da nave
+;;(define NAVE_IMG (scale 1 (bitmap "nave.gif")))
+(define NAVE_IMG (scale 0.2 (bitmap "space.png")))
+(define VELOCIDADE 4) ;; velocidade de movimento da nave
+(define NAVE_POSX 250)
+(define NAVE_POSY 470)
+(define LARGURA 500)
+(define ALTURA 500)
+(define CANTO_ESQUERDO (/ (image-width NAVE_IMG) 2))
+(define CANTO_DIREITO (- CENARIO-LARGURA (/ (image-width NAVE_IMG) 2)))
+(define inicia-nave NAVE_POSX)
+(define MEIO-H-NAVE (/ (image-width NAVE_IMG) 2 ))
+
+;____________________________________________________________________________________________________________________________________
+
+;;                                                 CONSTANTES DO TIRO
+
+;;Definicoes do tiro
+(define IMG-TIRO  (scale 0.05 (bitmap "tiro.png")))
+(define MEIO-H-TIRO (/ (image-width IMG-TIRO) 2 ))
+(define D-TIRO 30)
+
+
+;____________________________________________________________________________________________________________________________________
+
+;;                                             CONSTANTES DO ALIEN
+
+;;Definicoes do alien
+(define AL_IMG (scale 0.05 (bitmap "Space-medium-invader.png")))
+(define ALIEN_VELOCIDADE 3) 
+(define CANTO_ESQal (/ (image-width AL_IMG) 2))
+(define CANTO_DIRal (- CENARIO-LARGURA CANTO_ESQal))
+
+(define MEIO-H-ALIEN (/ (image-width AL_IMG) 2 ))
+
+
+;;
+(define Y (/ ALTURA 2))
+(define X-AL (/ LARGURA 2))
+(define DY-AL 5)
+
+
+
